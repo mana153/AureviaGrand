@@ -1,0 +1,87 @@
+/* ── Variables ───────────────────────────────────────────────── */
+:root {
+    --gold: #c9a84c;
+    --gold-dark: #a8893a;
+    --white: #ffffff;
+    --bg: #f9f6f0;
+}
+
+/* ── Global ──────────────────────────────────────────────────── */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--bg);
+    color: #333;
+}
+
+/* ── Auth page background ────────────────────────────────────── */
+.auth-bg {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 16px;
+    border: 1px solid rgba(201, 168, 76, 0.3);
+    background: var(--white);
+}
+
+/* ── Gold elements ───────────────────────────────────────────── */
+.gold-text {
+    color: var(--gold);
+}
+
+.gold-link {
+    color: var(--gold);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.gold-link:hover {
+    color: var(--gold-dark);
+    text-decoration: underline;
+}
+
+.btn-gold {
+    background-color: var(--gold);
+    border-color: var(--gold);
+    color: white;
+    border-radius: 8px;
+    padding: 10px;
+    transition: background 0.2s;
+}
+
+.btn-gold:hover {
+    background-color: var(--gold-dark);
+    border-color: var(--gold-dark);
+    color: white;
+}
+
+/* ── Navbar ──────────────────────────────────────────────────── */
+.navbar-luxury {
+    background-color: #1a1a2e;
+    border-bottom: 2px solid var(--gold);
+}
+
+.navbar-luxury .navbar-brand,
+.navbar-luxury .nav-link {
+    color: var(--white) !important;
+}
+
+.navbar-luxury .nav-link:hover {
+    color: var(--gold) !important;
+}
+
+/* ── Cards ───────────────────────────────────────────────────── */
+.card-luxury {
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+/* ── Badges ──────────────────────────────────────────────────── */
+.badge-pending    { background-color: #ffc107; color: #000; }
+.badge-confirmed  { background-color: #198754; color: #fff; }
+.badge-cancelled  { background-color: #dc3545; color: #fff; }
+.badge-checked-in { background-color: #0d6efd; color: #fff; }
+.badge-checked-out{ background-color: #6c757d; color: #fff; }
