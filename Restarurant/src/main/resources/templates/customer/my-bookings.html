@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>My Bookings — Luxury Hotel</title>
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-luxury px-4">
+    <a class="navbar-brand fw-bold fs-4" th:href="@{/}">&#9670; Luxury Hotel</a>
+    <div class="ms-auto d-flex gap-3 align-items-center">
+        <a th:href="@{/customer/dashboard}" class="nav-link">Dashboard</a>
+        <a th:href="@{/rooms}" class="nav-link">Rooms</a>
+        <a th:href="@{/customer/profile}" class="nav-link">Profile</a>
+        <form th:action="@{/auth/logout}" method="post" class="mb-0">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn btn-outline-light btn-sm">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">My Bookings</h2>
+        <a th:href="@{/rooms}" class="btn btn-gold px-4">+ New Booking</a>
+    </div>
+
+    <!-- Flash -->
+    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+    <div th:if="${errorMsg}" class="alert alert-danger" th:text="${errorMsg}"></div>
+
+    <div th:if="${#lists.isEmpty(bookings)}" class="text-center py-5 text-muted">
+        <div class="fs-1">🛏️</div>
+        <p>No bookings yet.</p>
+        <a th:href="@{/rooms}" class="btn btn-gold px-4">Browse Rooms</a>
+    </div>
+
+    <div th:unless="${#lists.isEmpty(bookings)}" class="row g-4">
+        <div class="col-md-6" th:each="b : ${bookings}">
+            <div class="card card-luxury p-4">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h5 class="fw-bold mb-1"
+                            th:text="'Room ' + ${b.room.roomNumber}"></h5>
+                        <span class="badge bg-secondary"
+                              th:text="${b.room.type}"></span>
+                    </div>
+                    <span class="badge"
+                          th:classappend="${b.status.name() == 'PENDING'} ? 'badge-pending' :
+                                         (${b.status.name() == 'CONFIRMED'} ? 'badge-confirmed' :
+                                         (${b.status.name() == 'CANCELLED'} ? 'badge-cancelled' :
+                                         (${b.status.name() == 'CHECKED_IN'} ? 'badge-checked-in' :
+                                         'badge-checked-out')))"
+                          th:text="${b.status}"></span>
+                </div>
+
+                <div class="row text-center mb-3">
+                    <div class="col-4">
+                        <small class="text-muted d-block">Check-In</small>
+                        <strong th:text="${b.checkInDate}"></strong>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted d-block">Nights</small>
+                        <strong th:text="${b.nights}"></strong>
+                    </div>
+                    <div class="col-4">
+                        <small class="text-muted d-block">Check-Out</small>
+                        <strong th:text="${b.checkOutDate}"></strong>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="gold-text fw-bold fs-5"
+                          th:text="'₹' + ${b.totalPrice}"></span>
+                    <form th:if="${b.cancellable}"
+                          th:action="@{/customer/bookings/{id}/cancel(id=${b.id})}"
+                          method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}"/>
+                        <button type="submit" class="btn btn-outline-danger btn-sm"
+                                onclick="return confirm('Cancel this booking?')">
+                            Cancel
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
