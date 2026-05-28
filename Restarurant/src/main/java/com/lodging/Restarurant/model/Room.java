@@ -51,7 +51,7 @@ public class Room {
 
     @Column(name = "is_available")
     @Builder.Default
-    private Boolean isAvailable = true;
+    private boolean available = true;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

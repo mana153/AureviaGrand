@@ -1,0 +1,35 @@
+# Copy to: src/main/resources/application.properties
+# (That path is gitignored — never commit real secrets.)
+
+spring.application.name=Restaurant
+server.port=8010
+
+spring.datasource.url=jdbc:postgresql://localhost:5432/hotel_db
+spring.datasource.username=${DB_USERNAME:postgres}
+spring.datasource.password=${DB_PASSWORD:changeme}
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+
+spring.thymeleaf.cache=false
+spring.thymeleaf.prefix=classpath:/templates/
+spring.thymeleaf.suffix=.html
+
+spring.servlet.multipart.enabled=true
+spring.servlet.multipart.max-file-size=5MB
+spring.servlet.multipart.max-request-size=10MB
+
+app.upload.dir=uploads/rooms
+app.name=AureviaGrand
+
+groq.api.key=${GROQ_API_KEY:}
+groq.api.url=https://api.groq.com/openai/v1/chat/completions
+
+razorpay.key.id=${RAZORPAY_KEY_ID:}
+razorpay.key.secret=${RAZORPAY_KEY_SECRET:}
+razorpay.currency=INR
+
+app.demo.sync-passwords=true

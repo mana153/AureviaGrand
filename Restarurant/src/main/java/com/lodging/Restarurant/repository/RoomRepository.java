@@ -13,13 +13,13 @@ import java.util.List;
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
 
-    List<Room> findByIsAvailableTrue();
+    List<Room> findByAvailableTrue();
 
     List<Room> findByType(RoomType type);
 
     // Rooms not booked in the given date range
     @Query("""
-        SELECT r FROM Room r WHERE r.isAvailable = true
+        SELECT r FROM Room r WHERE r.available = true
         AND r.id NOT IN (
             SELECT b.room.id FROM Booking b
             WHERE b.status NOT IN ('CANCELLED', 'CHECKED_OUT')

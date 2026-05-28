@@ -18,9 +18,23 @@ public class RoomService {
         return roomRepository.findAll();
     }
 
+    public long countAvailable() {
+        return roomRepository.findByAvailableTrue().size();
+    }
+
+    public List<Room> findBookable(LocalDate checkIn, LocalDate checkOut) {
+        if (checkIn != null && checkOut != null) {
+            if (!checkOut.isAfter(checkIn)) {
+                throw new RuntimeException("Check-out must be after check-in.");
+            }
+            return roomRepository.findAvailableRooms(checkIn, checkOut);
+        }
+        return roomRepository.findByAvailableTrue();
+    }
+
     // Show only first 3 available rooms on landing page
     public List<Room> findFeatured() {
-        return roomRepository.findByIsAvailableTrue()
+        return roomRepository.findByAvailableTrue()
                 .stream()
                 .limit(3)
                 .toList();

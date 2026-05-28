@@ -1,8 +1,11 @@
 package com.lodging.Restarurant.controller;
 
 import com.lodging.Restarurant.model.Booking;
+import com.lodging.Restarurant.model.Room;
 import com.lodging.Restarurant.model.User;
+import com.lodging.Restarurant.model.enums.BookingStatus;
 import com.lodging.Restarurant.service.BookingService;
+import com.lodging.Restarurant.service.PaymentService;
 import com.lodging.Restarurant.service.RoomService;
 import com.lodging.Restarurant.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -25,14 +28,11 @@ public class CustomerController {
     private final BookingService bookingService;
     private final RoomService roomService;
     private final UserService userService;
-
-    // ── Helper ────────────────────────────────────────────────────────────────
+    private final PaymentService paymentService;
 
     private User getLoggedInUser(UserDetails userDetails) {
         return userService.findByEmail(userDetails.getUsername());
     }
-
-    // ── Dashboard ─────────────────────────────────────────────────────────────
 
     @GetMapping("/dashboard")
     public String dashboard(@AuthenticationPrincipal UserDetails userDetails,
@@ -45,19 +45,24 @@ public class CustomerController {
         model.addAttribute("totalBookings", bookings.size());
         model.addAttribute("activeBookings",
                 bookings.stream()
-                        .filter(b -> b.getStatus().name().equals("CONFIRMED")
-                                || b.getStatus().name().equals("CHECKED_IN"))
+                        .filter(b -> b.getStatus() == BookingStatus.CONFIRMED
+                                || b.getStatus() == BookingStatus.CHECKED_IN)
                         .count());
+        model.addAttribute("availableRooms", roomService.countAvailable());
         return "customer/dashboard";
     }
-
-    // ── Book Room ─────────────────────────────────────────────────────────────
 
     @GetMapping("/book/{roomId}")
     public String bookRoomPage(@PathVariable Long roomId,
                                @AuthenticationPrincipal UserDetails userDetails,
-                               Model model) {
-        model.addAttribute("room", roomService.findById(roomId));
+                               Model model,
+                               RedirectAttributes flash) {
+        Room room = roomService.findById(roomId);
+        if (!room.isAvailable()) {
+            flash.addFlashAttribute("errorMsg", "This room is not available for booking.");
+            return "redirect:/rooms";
+        }
+        model.addAttribute("room", room);
         model.addAttribute("today", LocalDate.now());
         model.addAttribute("tomorrow", LocalDate.now().plusDays(1));
         return "customer/book-room";
@@ -74,7 +79,8 @@ public class CustomerController {
         try {
             User user = getLoggedInUser(userDetails);
             bookingService.createBooking(user.getId(), roomId, checkIn, checkOut);
-            flash.addFlashAttribute("successMsg", "Booking confirmed! Awaiting staff approval.");
+            flash.addFlashAttribute("successMsg",
+                    "Booking submitted! Our staff will confirm it shortly.");
         } catch (RuntimeException e) {
             flash.addFlashAttribute("errorMsg", e.getMessage());
             return "redirect:/customer/book/" + roomId;
@@ -82,13 +88,12 @@ public class CustomerController {
         return "redirect:/customer/bookings";
     }
 
-    // ── My Bookings ───────────────────────────────────────────────────────────
-
     @GetMapping("/bookings")
     public String myBookings(@AuthenticationPrincipal UserDetails userDetails,
                              Model model) {
         User user = getLoggedInUser(userDetails);
         model.addAttribute("bookings", bookingService.findByCustomer(user.getId()));
+        model.addAttribute("razorpayEnabled", paymentService.isConfigured());
         return "customer/my-bookings";
     }
 
@@ -105,8 +110,6 @@ public class CustomerController {
         }
         return "redirect:/customer/bookings";
     }
-
-    // ── Profile ───────────────────────────────────────────────────────────────
 
     @GetMapping("/profile")
     public String profilePage(@AuthenticationPrincipal UserDetails userDetails,

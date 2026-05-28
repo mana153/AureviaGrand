@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>API Dashboard — AureviaGrand</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" th:href="@{/css/style.css}"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<nav th:replace="~{fragments/admin-nav :: nav(active='api')}"></nav>
+
+<div class="container section-padding" style="padding-top:120px;">
+    <span class="role-pill">Administrator</span>
+    <h2 class="mb-1 mt-2">API Dashboard</h2>
+    <p class="text-muted mb-4">Manage third-party partner access and monitor API usage</p>
+
+    <!-- Flash -->
+    <div th:if="${successMsg}" class="alert alert-success" th:text="${successMsg}"></div>
+    <div th:if="${errorMsg}"   class="alert alert-danger"  th:text="${errorMsg}"></div>
+
+    <!-- Total calls stat -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="card card-luxury text-center p-4">
+                <div class="fs-1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M5 12C5 8.1 8.1 5 12 5C15.9 5 19 8.1 19 12" stroke="currentColor" stroke-width="2"/><path d="M2 12C2 6.5 6.5 2 12 2C17.5 2 22 6.5 22 12" stroke="currentColor" stroke-width="2"/></svg></div>
+                <h3 class="fw-bold gold-text" th:text="${totalCalls}">0</h3>
+                <p class="text-muted mb-0">Total API Calls</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-luxury text-center p-4">
+                <div class="fs-1"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="8" cy="12" r="3" stroke="currentColor" stroke-width="2"/><path d="M11 12H22M18 12V9M15 12V10" stroke="currentColor" stroke-width="2"/></svg></div>
+                <h3 class="fw-bold gold-text" th:text="${#lists.size(apiKeys)}">0</h3>
+                <p class="text-muted mb-0">API Keys</p>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="col-md-3">
+            <div class="card card-luxury p-3">
+                <h6 class="fw-bold mb-2">Calls by Endpoint</h6>
+                <canvas id="endpointChart" height="120"></canvas>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-luxury p-3">
+                <h6 class="fw-bold mb-2">Calls by Partner</h6>
+                <canvas id="partnerChart" height="120"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Partner API reference -->
+    <div class="card card-luxury p-4 mb-4">
+        <h5 class="fw-bold gold-text mb-3">Partner API (Zomato / Swiggy)</h5>
+        <p class="text-muted small mb-3">Base URL: <code>/api/v1</code> — Header: <code>X-API-KEY: your_key</code></p>
+        <div class="table-responsive">
+            <table class="table table-sm">
+                <thead class="table-dark">
+                <tr><th>Action</th><th>Method</th><th>Endpoint</th></tr>
+                </thead>
+                <tbody class="small">
+                <tr><td>List rooms</td><td>GET</td><td><code>/api/v1/rooms?checkIn=&amp;checkOut=</code></td></tr>
+                <tr><td>List bookings</td><td>GET</td><td><code>/api/v1/bookings</code></td></tr>
+                <tr><td>Get booking</td><td>GET</td><td><code>/api/v1/bookings/{id}</code></td></tr>
+                <tr><td>Create booking</td><td>POST</td><td><code>/api/v1/bookings</code></td></tr>
+                <tr><td>Update booking</td><td>PUT</td><td><code>/api/v1/bookings/{id}</code></td></tr>
+                <tr><td>Cancel booking</td><td>PUT</td><td><code>/api/v1/bookings/{id}/cancel</code></td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create API Key -->
+    <div class="card card-luxury p-4 mb-5">
+        <h5 class="fw-bold mb-3 gold-text">Generate New API Key</h5>
+        <form th:action="@{/admin/api-keys/create}" method="post" class="row g-3">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <div class="col-md-4">
+                <input type="text" name="partnerName" class="form-control"
+                       placeholder="Partner name (e.g. Zomato)" required/>
+            </div>
+            <div class="col-md-3">
+                <input type="number" name="customerId" class="form-control"
+                       placeholder="Customer user ID" min="1" required/>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-gold w-100">Generate Key</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- API Keys Table -->
+    <h5 class="fw-bold mb-3">Active API Keys</h5>
+    <div class="table-responsive mb-5">
+        <table class="table table-hover align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Partner</th>
+                <th>Customer ID</th>
+                <th>Key</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Last Used</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="k : ${apiKeys}">
+                <td th:text="${k.id}"></td>
+                <td th:text="${k.partnerName}"></td>
+                <td th:text="${k.customerId != null ? k.customerId : '—'}"></td>
+                <td>
+                    <code th:text="${k.keyValue}"
+                          style="font-size:0.8rem;"></code>
+                </td>
+                <td>
+                    <span th:if="${k.active}"   class="badge bg-success">Active</span>
+                    <span th:unless="${k.active}" class="badge bg-danger">Revoked</span>
+                </td>
+                <td th:text="${k.createdAt != null ?
+                        #temporals.format(k.createdAt,'dd MMM yyyy') : '—'}"></td>
+                <td th:text="${k.lastUsedAt != null ?
+                        #temporals.format(k.lastUsedAt,'dd MMM HH:mm') : 'Never'}"></td>
+                <td>
+                    <form th:action="@{/admin/api-keys/{id}/toggle(id=${k.id})}"
+                          method="post" class="d-inline">
+                        <input type="hidden" th:name="${_csrf.parameterName}"
+                               th:value="${_csrf.token}"/>
+                        <button th:class="${k.active} ?
+                                    'btn btn-warning btn-sm' : 'btn btn-success btn-sm'"
+                                th:text="${k.active} ? 'Revoke' : 'Activate'">
+                        </button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Recent Calls Log -->
+    <h5 class="fw-bold mb-3">Recent API Calls (last 100)</h5>
+    <div class="table-responsive">
+        <table class="table table-sm align-middle">
+            <thead class="table-dark">
+            <tr>
+                <th>Time</th>
+                <th>Partner</th>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="log : ${logs}">
+                <td th:text="${#temporals.format(log.calledAt,'dd MMM HH:mm:ss')}"
+                    class="text-muted small"></td>
+                <td th:text="${log.partnerName}"></td>
+                <td>
+                        <span class="badge bg-secondary"
+                              th:text="${log.method}"></span>
+                </td>
+                <td><code th:text="${log.endpoint}" class="small"></code></td>
+                <td><span class="badge bg-success" th:text="${log.statusCode}"></span></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Chart data from server -->
+<script th:inline="javascript">
+    const endpointStats = /*[[${endpointStats}]]*/ [];
+    const partnerStats  = /*[[${partnerStats}]]*/ [];
+</script>
+<script>
+    if (endpointStats.length) {
+        new Chart(document.getElementById('endpointChart'), {
+            type: 'doughnut',
+            data: {
+                labels: endpointStats.map(e => e[0]),
+                datasets: [{
+                    data: endpointStats.map(e => e[1]),
+                    backgroundColor: ['#c9a84c','#28a745','#007bff','#dc3545','#6c757d'],
+                    borderWidth: 0
+                }]
+            },
+            options: { plugins: { legend: { position: 'bottom', labels: { font: { size: 10 } } } }, cutout: '55%' }
+        });
+    }
+
+    if (partnerStats.length) {
+        new Chart(document.getElementById('partnerChart'), {
+            type: 'bar',
+            data: {
+                labels: partnerStats.map(p => p[0]),
+                datasets: [{
+                    data: partnerStats.map(p => p[1]),
+                    backgroundColor: '#c9a84c',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+            }
+        });
+    }
+</script>
+
+<script th:src="@{/js/concierge-widget.js}"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

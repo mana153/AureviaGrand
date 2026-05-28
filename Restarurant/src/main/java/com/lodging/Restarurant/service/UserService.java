@@ -21,6 +21,15 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found."));
     }
 
+    public User requireCustomer(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found."));
+        if (!user.isCustomer()) {
+            throw new RuntimeException("User #" + id + " is not a customer account.");
+        }
+        return user;
+    }
+
     public List<User> findAll() {
         return userRepository.findAll();
     }

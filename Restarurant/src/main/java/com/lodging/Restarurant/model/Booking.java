@@ -62,6 +62,10 @@ public class Booking {
     @Builder.Default
     private BookingStatus status = BookingStatus.PENDING;
 
+    /** Set for bookings created via partner API ({@code /api/v1}); null for web bookings. */
+    @Column(name = "source_partner", length = 100)
+    private String sourcePartner;
+
     // ── Timestamps ────────────────────────────────────────────────────────────
 
     @CreationTimestamp

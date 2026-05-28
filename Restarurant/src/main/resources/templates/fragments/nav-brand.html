@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+<a th:fragment="brand"
+   class="navbar-brand fw-bold fs-4"
+   th:href="@{/}"
+   sec:authorize="!isAuthenticated()">AUREVIAGRAND</a>
+<a th:fragment="brand"
+   class="navbar-brand fw-bold fs-4"
+   th:href="@{/customer/dashboard}"
+   sec:authorize="hasRole('CUSTOMER')">AUREVIAGRAND</a>
+<a th:fragment="brand"
+   class="navbar-brand fw-bold fs-4"
+   th:href="@{/staff/dashboard}"
+   sec:authorize="hasRole('STAFF')">AUREVIAGRAND</a>
+<a th:fragment="brand"
+   class="navbar-brand fw-bold fs-4"
+   th:href="@{/admin/dashboard}"
+   sec:authorize="hasRole('ADMIN')">AUREVIAGRAND</a>
+</body>
+</html>

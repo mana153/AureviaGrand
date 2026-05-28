@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
-    <title>About — Luxury Hotel</title>
+    <title>About — AureviaGrand</title>
     <link rel="stylesheet"
           href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" th:href="@{/css/style.css}"/>
@@ -11,24 +12,28 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-luxury px-4">
-    <a class="navbar-brand fw-bold fs-4" th:href="@{/}">&#9670; Luxury Hotel</a>
-    <div class="ms-auto d-flex gap-3">
+    <th:block th:replace="~{fragments/nav-brand :: brand}"></th:block>
+    <div class="ms-auto d-flex align-items-center nav-links-group">
         <a th:href="@{/rooms}" class="nav-link">Rooms</a>
-        <a th:href="@{/about}" class="nav-link">About</a>
-        <a th:href="@{/auth/login}" class="btn btn-gold px-4">Login</a>
+        <a th:href="@{/restaurant}" class="nav-link">Dining</a>
+        <a th:href="@{/about}" class="nav-link active">About</a>
+        <a th:href="@{/auth/login}" class="btn btn-outline-gold btn-sm">Login</a>
     </div>
 </nav>
 
-<div class="bg-dark text-white text-center py-5">
-    <h1 class="fw-bold">About Us</h1>
-    <p class="text-white-50">Redefining luxury hospitality since 2005</p>
-</div>
+<section class="section-black section-padding" style="padding-top:140px; padding-bottom:70px;">
+    <div class="container text-center">
+        <h1 class="display-5">About AureviaGrand</h1>
+        <p class="text-white-50 mb-0">Redefining luxury hospitality since 2005</p>
+    </div>
+</section>
 
-<div class="container my-5">
+<section class="container section-padding pt-5">
     <div class="row align-items-center g-5">
         <div class="col-md-6">
-            <h2 class="fw-bold mb-3">Our Story</h2>
-            <p class="text-muted">Founded in 2005, Luxury Hotel has been a beacon of
+            <h2 class="mb-3">Our Story</h2>
+            <div class="gold-underline"></div>
+            <p class="text-muted">Founded in 2005, AureviaGrand has been a beacon of
                 world-class hospitality in the heart of the city. We blend timeless elegance
                 with modern comforts to deliver an experience unlike any other.</p>
             <p class="text-muted">Our team of dedicated professionals works round the
@@ -50,15 +55,14 @@
         </div>
         <div class="col-md-6">
             <img src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb"
-                 class="img-fluid rounded-4 shadow" alt="Hotel lobby"/>
+                 class="img-fluid shadow" style="height:620px; width:100%; object-fit:cover;" alt="Hotel lobby"/>
         </div>
     </div>
-</div>
+</section>
 
-<footer class="text-center py-4 border-top">
-    <small class="text-muted">&copy; 2025 Luxury Hotel. All rights reserved.</small>
-</footer>
+<footer th:replace="~{fragments/site-footer :: footer}"></footer>
 
+<script th:src="@{/js/concierge-widget.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

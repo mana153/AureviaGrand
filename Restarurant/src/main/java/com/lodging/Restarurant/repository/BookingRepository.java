@@ -14,8 +14,11 @@ import java.util.List;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     List<Booking> findByCustomerIdOrderByCreatedAtDesc(Long customerId);
+    java.util.Optional<Booking> findFirstByCustomerIdAndStatusOrderByCreatedAtDesc(Long customerId, BookingStatus status);
 
     List<Booking> findAllByOrderByCreatedAtDesc();
+
+    List<Booking> findBySourcePartnerOrderByCreatedAtDesc(String sourcePartner);
 
     @Query("""
         SELECT COUNT(b) = 0 FROM Booking b
@@ -26,6 +29,18 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     boolean isRoomAvailable(@Param("roomId") Long roomId,
                             @Param("checkIn") LocalDate checkIn,
                             @Param("checkOut") LocalDate checkOut);
+
+    @Query("""
+        SELECT COUNT(b) = 0 FROM Booking b
+        WHERE b.room.id = :roomId
+        AND b.id <> :bookingId
+        AND b.status NOT IN ('CANCELLED', 'CHECKED_OUT')
+        AND NOT (b.checkOutDate <= :checkIn OR b.checkInDate >= :checkOut)
+    """)
+    boolean isRoomAvailableExcluding(@Param("roomId") Long roomId,
+                                     @Param("bookingId") Long bookingId,
+                                     @Param("checkIn") LocalDate checkIn,
+                                     @Param("checkOut") LocalDate checkOut);
 
     long countByStatus(BookingStatus status);
 

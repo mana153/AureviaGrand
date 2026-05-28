@@ -11,6 +11,7 @@ build/
 *.iml
 
 application.properties
+uploads/
 
 ### STS ###
 .apt_generated
@@ -40,3 +41,35 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Log files ###
+*.log
+logs/
+
+### Operating System files ###
+.DS_Store
+Thumbs.db
+._*
+
+### AI / LLM ###
+.ai/
+.copilot/
+.llm-cache/
+.cursor/
+.cursorignore
+*.ai
+*.generated.*
+*.gen.*
+.prompt*
+.prompts/
+.claude/
+.github/copilot-instructions.md
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/

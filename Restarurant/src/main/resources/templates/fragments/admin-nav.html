@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<nav th:fragment="nav(active)" class="navbar navbar-expand-lg navbar-luxury px-4">
+    <a class="navbar-brand fw-bold fs-4" th:href="@{/admin/dashboard}">AUREVIAGRAND</a>
+    <div class="ms-auto d-flex flex-wrap align-items-center nav-links-group">
+        <a th:href="@{/admin/dashboard}" class="nav-link"
+           th:classappend="${active == 'dashboard'} ? 'active' : ''">Dashboard</a>
+        <a th:href="@{/admin/rooms}" class="nav-link"
+           th:classappend="${active == 'rooms'} ? 'active' : ''">Rooms</a>
+        <a th:href="@{/admin/users}" class="nav-link"
+           th:classappend="${active == 'users'} ? 'active' : ''">Users</a>
+        <a th:href="@{/admin/analytics}" class="nav-link"
+           th:classappend="${active == 'analytics'} ? 'active' : ''">Analytics</a>
+        <a th:href="@{/admin/api}" class="nav-link"
+           th:classappend="${active == 'api'} ? 'active' : ''">API</a>
+        <a th:href="@{/staff/bookings}" class="nav-link text-warning"
+           title="Confirm bookings, check-in/out">Staff Ops</a>
+        <form th:action="@{/auth/logout}" method="post" class="mb-0 ms-2">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="btn nav-logout-btn btn-sm">Logout</button>
+        </form>
+    </div>
+</nav>
+</body>
+</html>
